@@ -1,0 +1,56 @@
+Employee_Database_challenge.sql
+
+retirement_titles.csv, 
+unique_titles.csv,
+retiring_titles.csv, and 
+mentorship_eligibilty.csv
+
+------------------------------------------------------------------
+ISSUE 
+
+On Module 7 Deliverable 2 (Latest title is not getting displayed in the mentorship_Eligibility)
+
+1) titles table is not sorted properly based on (emp_no & from_date)
+so, for some employees the previous title is present as first row and the latest as second row
+
+2) As we are taking the from_date from department_employee table(it has only the first joining date in from_date). So when DISTINCT is trying to fetch the unique record, its considering the different title as all the column values are same except title.
+
+FIX:
+
+1) Sort the titles table based on Employee and to_date in Descending order.
+
+2) Join the tables and use DISTINCT to fetch the unique employees. 
+
+3) To fetch the latest title of the employee, we have to sort the employees based on emp_no & from _date of titles in Descending.
+
+------------------------------------------------------------------
+SELECT * 
+INTO titles_new
+from titles
+ORDER BY emp_no, to_date DESC;
+
+SELECT count(emp_no) from titles_new;
+
+DROP TABLE mentorship_eligibility;
+
+-- SELECT DISTINCT ON(t.emp_no) e.emp_no, e.first_name, e.last_name, e.birth_date, de.from_date, de.to_date, t.title
+-- INTO mentorship_eligibility
+SELECT DISTINCT ON (e.emp_no) e.emp_no, e.first_name, e.last_name, e.birth_date, de.from_date, de.to_date, t.title
+INTO mentorship_eligibility
+FROM employees AS e
+JOIN dept_employees AS de
+ON (e.emp_no = de.emp_no)
+JOIN titles_new AS t
+ON e.emp_no = t.emp_no	
+WHERE (de.to_date = '9999-01-01' AND (e.birth_date BETWEEN '1965-01-01' AND '1965-12-31'))
+ORDER BY e.emp_no, t.from_date DESC;
+
+SELECT * from mentorship_eligibility;
+
+SELECT * from mentorship_eligibility where emp_no = 10095; 
+
+SELECT count(emp_no) from mentorship_eligibility;
+
+SELECT * from titles_new where emp_no = 10095;
+------------------------------------------------------------------
+
